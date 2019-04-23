@@ -1,0 +1,4 @@
+This folder contains the pcap traces taken during the proxy test. The environment was a client connected to the syn-proxy and then it is connected to a server.
+
+CLIENT (eth0) <------> SYN-PROXY <--------> (eth3) SERVER
+

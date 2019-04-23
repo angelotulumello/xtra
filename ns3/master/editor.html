@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> 
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    table, td {
+      border: 1px solid black;
+    }
+  </style>
+  <title>Transport protocol xfsm editor</title>
+</head>
+<body>
+
+
+<div class="container-fluid">
+  <h1><strong>Transport protocol xfsm editor</strong></h1>
+  <br><br>
+  <div class="row">
+    <div class="col-sm-2"><label for="initialstate"><strong>Initial state: </strong></label></div>
+    <div class="col-sm-4"><input type="text" id="initialstate" value="0" class="form-control"></div>
+  </div>
+  <br><br>
+</div>
+
+<div class="container-fluid">
+  <table id="conditions" class="table table-striped">
+    <thead>
+      <tr class="d-flex">
+        <th class="col-sm-1"><strong>id</strong></th>
+        <th><strong>opcode</strong></th>
+        <th class="col-sm-1"><strong>op0</strong></th>
+        <th><strong>op1</strong></th>
+        <th class="col-sm-1"></th>
+      </tr>
+    </thead>
+  </table>
+  <br>
+  <button onclick="addConditionsRow()" class="btn btn-primary">Add condition</button>
+  <br><br>
+</div>
+
+  <div class="container-fluid">
+  <table id="table" class="table table-striped">
+      <thead>
+        <tr class="d-flex">
+          <th><strong>id</strong></th>
+          <th><strong>condition_results</strong></th>
+          <th><strong>state</strong></th>
+          <th><strong>event</strong></th>
+          <th><strong>next_state</strong></th>
+          <th><strong>actions</strong></th>
+          <th></th>
+        </tr>
+      </thead>
+  </table>
+
+  <br>
+  <button onclick="addTableRow()" class="btn btn-primary">Add table entry</button>
+  <button onclick="tableToJSON()" class="btn btn-success">Convert to JSON</button>
+  <br><br>
+</div>
+
+<div class="container-fluid">
+  <pre id="output"></pre>
+</div>
+
+<script>
+var tableRows = 0;
+var conditions = 0;
+
+function addConditionsRow() {
+    var table = document.getElementById("conditions");
+    var row = table.insertRow(-1);
+    var cell0 = row.insertCell(0);
+    var cell1 = row.insertCell(1);
+    var cell2 = row.insertCell(2);
+    var cell3 = row.insertCell(3);
+    var cell4 = row.insertCell(4);
+    
+    cell0.innerHTML = '<input type="text" name="id" value="'+conditions.toString()+'" class="form-control" readonly="readonly">'
+    cell1.innerHTML = '<select name="opcode" class="selectpicker"><option value="XFSM_LESS"><</option><option value="XFSM_LESS_EQ"><=</option><option value="XFSM_GREATER">></option><option value="XFSM_GREATER_EQ">>=</option><option value="XFSM_EQUAL">==</option><option value="XFSM_NOT_EQUAL">!=</option></select>';
+    cell2.innerHTML = '<select name="op0" class="selectpicker"><option value="XFSM_NULL">XFSM_NULL</option><option value="XFSM_CWND">XFSM_CWND</option><option value="XFSM_SSTHRESH">XFSM_SSTHRESH</option><option value="XFSM_SEGMENTSIZE">XFSM_SEGMENTSIZE</option><option value="XFSM_LASTACKEDSEQ">XFSM_LASTACKEDSEQ</option><option value="XFSM_HIGHTXMARK">XFSM_HIGHTXMARK</option><option value="XFSM_NEXTTXSEQ">XFSM_NEXTTXSEQ</option><option value="XFSM_RCVTIMESTAMPVALUE">XFSM_RCVTIMESTAMPVALUE</option><option value="XFSM_RCVTIMESTAMPVALUEECHOREPLY">XFSM_RCVTIMESTAMPVALUEECHOREPLY</option><option value="XFSM_RTT">XFSM_RTT</option><option value="XFSM_AVAILABLE_WIN">XFSM_AVAILABLE_WIN</option><option value="XFSM_CUSTOM0">XFSM_CUSTOM0</option><option value="XFSM_CUSTOM1">XFSM_CUSTOM1</option><option value="XFSM_CUSTOM2">XFSM_CUSTOM2</option> <option value="XFSM_CUSTOM3">XFSM_CUSTOM3</option><option value="XFSM_CUSTOM4">XFSM_CUSTOM4</option><option value="XFSM_CUSTOM5">XFSM_CUSTOM5</option><option value="XFSM_CUSTOM6">XFSM_CUSTOM6</option><option value="XFSM_CUSTOM7">XFSM_CUSTOM7</option><option value="XFSM_ARG0">XFSM_ARG0</option><option value="XFSM_ARG1">XFSM_ARG1</option><option value="XFSM_ARG2">XFSM_ARG2</option><option value="XFSM_CONTEXT_PARAM0">XFSM_CONTEXT_PARAM0</option><option value="XFSM_CONTEXT_PARAM1">XFSM_CONTEXT_PARAM1</option><option value="XFSM_SACK_LEFT0">XFSM_SACK_LEFT0</option><option value="XFSM_SACK_LEFT1">XFSM_SACK_LEFT1</option><option value="XFSM_SACK_LEFT2">XFSM_SACK_LEFT2</option><option value="XFSM_SACK_RIGHT0">XFSM_SACK_RIGHT0</option><option value="XFSM_SACK_RIGHT1">XFSM_SACK_RIGHT1</option><option value="XFSM_SACK_RIGHT2">XFSM_SACK_RIGHT2</option><option value="XFSM_TIMESTAMP">XFSM_TIMESTAMP</option><option value="XFSM_ZERO">XFSM_ZERO</option></select>';
+    cell3.innerHTML = '<input type="text" name="op1" class="form-control" list="registers"><datalist id="registers"><option value="XFSM_NULL"></option><option value="XFSM_CWND"></option><option value="XFSM_SSTHRESH"></option><option value="XFSM_SEGMENTSIZE"></option><option value="XFSM_LASTACKEDSEQ"></option><option value="XFSM_HIGHTXMARK"></option><option value="XFSM_NEXTTXSEQ"></option><option value="XFSM_RCVTIMESTAMPVALUE"></option><option value="XFSM_RCVTIMESTAMPVALUEECHOREPLY"></option><option value="XFSM_RTT"></option><option value="XFSM_AVAILABLE_WIN"></option><option value="XFSM_CUSTOM0"></option><option value="XFSM_CUSTOM1"></option><option value="XFSM_CUSTOM2"></option> <option value="XFSM_CUSTOM3"></option><option value="XFSM_CUSTOM4"></option><option value="XFSM_CUSTOM5"></option><option value="XFSM_CUSTOM6"></option><option value="XFSM_CUSTOM7"></option><option value="XFSM_ARG0"></option><option value="XFSM_ARG1"></option><option value="XFSM_ARG2"></option><option value="XFSM_CONTEXT_PARAM0"></option><option value="XFSM_CONTEXT_PARAM1"></option><option value="XFSM_SACK_LEFT0"></option><option value="XFSM_SACK_LEFT1"></option><option value="XFSM_SACK_LEFT2"></option><option value="XFSM_SACK_RIGHT0"></option><option value="XFSM_SACK_RIGHT1"></option><option value="XFSM_SACK_RIGHT2"></option><option value="XFSM_TIMESTAMP"></option><option value="XFSM_ZERO"></option></datalist>';
+    cell4.innerHTML = '<input type="button" value="Delete condition" onclick="DeleteRow(this)" class="btn btn-danger">';
+
+    conditions = conditions + 1;
+}
+
+function addTableRow() {
+    var table = document.getElementById("table");
+    var row = table.insertRow(-1);
+    var cell0 = row.insertCell(0);
+    var cell1 = row.insertCell(1);
+    var cell2 = row.insertCell(2);
+    var cell3 = row.insertCell(3);
+    var cell4 = row.insertCell(4);
+    var cell5 = row.insertCell(5);
+    var cell6 = row.insertCell(6);
+
+    cell0.innerHTML = '<input type="text" name="id" value="'+tableRows.toString()+'" readonly="readonly">';
+    cell1.innerHTML = '<input type="text" name="condition_results">';
+    cell2.innerHTML = '<input type="text" name="state">';
+    cell3.innerHTML = '<select name="event" class="selectpicker"><option value="XFSM_ACK">XFSM_ACK</option><option value="XFSM_TIMEOUT">XFSM_TIMEOUT</option><option value="XFSM_GENERIC_TIMEOUT">XFSM_GENERIC_TIMEOUT</option><option value="XFSM_SACK">XFSM_SACK</option>';
+    cell4.innerHTML = '<input type="text" name="next_state" class="form-control">';
+    cell5.innerHTML = `
+                      <table id="action`+tableRows+`" class="table table-striped">
+                        <tr class="d-flex">
+                          <th><strong>type</strong></th>
+                          <th><strong>op0</strong></th>
+                          <th><strong>op1</strong></th>
+                          <th><strong>dest</strong></th>
+                          <th><button onclick="addAction(this)" class="btn btn-primary" name=`+tableRows+`>Add action</button></th>
+                        </tr>
+                      </table>
+                      `
+    cell6.innerHTML = '<input type="button" value="Delete table entry" onclick="DeleteRow(this)" class="btn btn-danger">';
+
+    tableRows = tableRows + 1;
+}
+
+
+function actionChanged(o)
+{
+  var value = ""+o.value;
+  var row = o.parentNode.parentNode;
+
+  if(isAnUpdate(value))
+  {
+    row.cells[1].children[0].disabled = false;
+    row.cells[2].children[0].disabled = false;
+    row.cells[3].children[0].disabled = false;
+  }
+  else
+  {
+    row.cells[1].children[0].disabled = true;
+    row.cells[2].children[0].disabled = true;
+    row.cells[3].children[0].disabled = true;
+  }
+ 
+}
+
+function isAnUpdate(val)
+{
+  var op = ""+val;
+  return !(op==="XFSM_SENDPCKT" || op==="XFSM_SETTIMER" || op==="XFSM_SETGENERICTIMER" || op==="XFSM_REMOVETIMER" ||
+   op==="XFSM_REMOVETIMERS");
+}
+
+function addAction(o)
+{
+  var id = o.name;
+  var table = document.getElementById("action"+id);
+  var row = table.insertRow(-1);
+  var cell0 = row.insertCell(0);
+  var cell1 = row.insertCell(1);
+  var cell2 = row.insertCell(2);
+  var cell3 = row.insertCell(3);
+  var cell4 = row.insertCell(4);
+
+  cell0.innerHTML = '<select name="opcode" class="selectpicker" onchange="actionChanged(this)"><option value="XFSM_SUM">XFSM_SUM</option><option value="XFSM_MINUS">XFSM_MINUS</option><option value="XFSM_MULTIPLY">XFSM_MULTIPLY</option><option value="XFSM_DIVIDE">XFSM_DIVIDE</option><option value="XFSM_MODULO">XFSM_MODULO</option><option value="XFSM_MAX">XFSM_MAX</option><option value="XFSM_MIN">XFSM_MIN</option><option value="XFSM_SENDPCKT">XFSM_SENDPCKT</option><option value="XFSM_SETTIMER">XFSM_SETTIMER</option><option value="XFSM_SETGENERICTIMER">XFSM_SETGENERICTIMER</option><option value="XFSM_REMOVETIMER">XFSM_REMOVETIMER</option><option value="XFSM_REMOVETIMERS">XFSM_REMOVETIMERS</option></select>';
+  cell1.innerHTML = '<select name="op0" class="selectpicker"><option value="XFSM_NULL">XFSM_NULL</option><option value="XFSM_CWND">XFSM_CWND</option><option value="XFSM_SSTHRESH">XFSM_SSTHRESH</option><option value="XFSM_SEGMENTSIZE">XFSM_SEGMENTSIZE</option><option value="XFSM_LASTACKEDSEQ">XFSM_LASTACKEDSEQ</option><option value="XFSM_HIGHTXMARK">XFSM_HIGHTXMARK</option><option value="XFSM_NEXTTXSEQ">XFSM_NEXTTXSEQ</option><option value="XFSM_RCVTIMESTAMPVALUE">XFSM_RCVTIMESTAMPVALUE</option><option value="XFSM_RCVTIMESTAMPVALUEECHOREPLY">XFSM_RCVTIMESTAMPVALUEECHOREPLY</option><option value="XFSM_RTT">XFSM_RTT</option><option value="XFSM_AVAILABLE_WIN">XFSM_AVAILABLE_WIN</option><option value="XFSM_CUSTOM0">XFSM_CUSTOM0</option><option value="XFSM_CUSTOM1">XFSM_CUSTOM1</option><option value="XFSM_CUSTOM2">XFSM_CUSTOM2</option> <option value="XFSM_CUSTOM3">XFSM_CUSTOM3</option><option value="XFSM_CUSTOM4">XFSM_CUSTOM4</option><option value="XFSM_CUSTOM5">XFSM_CUSTOM5</option><option value="XFSM_CUSTOM6">XFSM_CUSTOM6</option><option value="XFSM_CUSTOM7">XFSM_CUSTOM7</option><option value="XFSM_ARG0">XFSM_ARG0</option><option value="XFSM_ARG1">XFSM_ARG1</option><option value="XFSM_ARG2">XFSM_ARG2</option><option value="XFSM_CONTEXT_PARAM0">XFSM_CONTEXT_PARAM0</option><option value="XFSM_CONTEXT_PARAM1">XFSM_CONTEXT_PARAM1</option><option value="XFSM_SACK_LEFT0">XFSM_SACK_LEFT0</option><option value="XFSM_SACK_LEFT1">XFSM_SACK_LEFT1</option><option value="XFSM_SACK_LEFT2">XFSM_SACK_LEFT2</option><option value="XFSM_SACK_RIGHT0">XFSM_SACK_RIGHT0</option><option value="XFSM_SACK_RIGHT1">XFSM_SACK_RIGHT1</option><option value="XFSM_SACK_RIGHT2">XFSM_SACK_RIGHT2</option><option value="XFSM_TIMESTAMP">XFSM_TIMESTAMP</option><option value="XFSM_ZERO">XFSM_ZERO</option></select>';
+  cell2.innerHTML = '<input type="text" name="op1" list="registers"><datalist id="registers"><option value="XFSM_NULL"></option><option value="XFSM_CWND"></option><option value="XFSM_SSTHRESH"></option><option value="XFSM_SEGMENTSIZE"></option><option value="XFSM_LASTACKEDSEQ"></option><option value="XFSM_HIGHTXMARK"></option><option value="XFSM_NEXTTXSEQ"></option><option value="XFSM_RCVTIMESTAMPVALUE"></option><option value="XFSM_RCVTIMESTAMPVALUEECHOREPLY"></option><option value="XFSM_RTT"></option><option value="XFSM_AVAILABLE_WIN"></option><option value="XFSM_CUSTOM0"></option><option value="XFSM_CUSTOM1"></option><option value="XFSM_CUSTOM2"></option> <option value="XFSM_CUSTOM3"></option><option value="XFSM_CUSTOM4"></option><option value="XFSM_CUSTOM5"></option><option value="XFSM_CUSTOM6"></option><option value="XFSM_CUSTOM7"></option><option value="XFSM_ARG0"></option><option value="XFSM_ARG1"></option><option value="XFSM_ARG2"></option><option value="XFSM_CONTEXT_PARAM0"></option><option value="XFSM_CONTEXT_PARAM1"></option><option value="XFSM_SACK_LEFT0"></option><option value="XFSM_SACK_LEFT1"></option><option value="XFSM_SACK_LEFT2"></option><option value="XFSM_SACK_RIGHT0"></option><option value="XFSM_SACK_RIGHT1"></option><option value="XFSM_SACK_RIGHT2"></option><option value="XFSM_TIMESTAMP"></option><option value="XFSM_ZERO"></option></datalist>';
+  cell3.innerHTML = '<select name="op0" class="selectpicker"><option value="XFSM_NULL">XFSM_NULL</option><option value="XFSM_CWND">XFSM_CWND</option><option value="XFSM_SSTHRESH">XFSM_SSTHRESH</option><option value="XFSM_SEGMENTSIZE">XFSM_SEGMENTSIZE</option><option value="XFSM_LASTACKEDSEQ">XFSM_LASTACKEDSEQ</option><option value="XFSM_HIGHTXMARK">XFSM_HIGHTXMARK</option><option value="XFSM_NEXTTXSEQ">XFSM_NEXTTXSEQ</option><option value="XFSM_RCVTIMESTAMPVALUE">XFSM_RCVTIMESTAMPVALUE</option><option value="XFSM_RCVTIMESTAMPVALUEECHOREPLY">XFSM_RCVTIMESTAMPVALUEECHOREPLY</option><option value="XFSM_RTT">XFSM_RTT</option><option value="XFSM_AVAILABLE_WIN">XFSM_AVAILABLE_WIN</option><option value="XFSM_CUSTOM0">XFSM_CUSTOM0</option><option value="XFSM_CUSTOM1">XFSM_CUSTOM1</option><option value="XFSM_CUSTOM2">XFSM_CUSTOM2</option> <option value="XFSM_CUSTOM3">XFSM_CUSTOM3</option><option value="XFSM_CUSTOM4">XFSM_CUSTOM4</option><option value="XFSM_CUSTOM5">XFSM_CUSTOM5</option><option value="XFSM_CUSTOM6">XFSM_CUSTOM6</option><option value="XFSM_CUSTOM7">XFSM_CUSTOM7</option><option value="XFSM_ARG0">XFSM_ARG0</option><option value="XFSM_ARG1">XFSM_ARG1</option><option value="XFSM_ARG2">XFSM_ARG2</option><option value="XFSM_CONTEXT_PARAM0">XFSM_CONTEXT_PARAM0</option><option value="XFSM_CONTEXT_PARAM1">XFSM_CONTEXT_PARAM1</option><option value="XFSM_SACK_LEFT0">XFSM_SACK_LEFT0</option><option value="XFSM_SACK_LEFT1">XFSM_SACK_LEFT1</option><option value="XFSM_SACK_LEFT2">XFSM_SACK_LEFT2</option><option value="XFSM_SACK_RIGHT0">XFSM_SACK_RIGHT0</option><option value="XFSM_SACK_RIGHT1">XFSM_SACK_RIGHT1</option><option value="XFSM_SACK_RIGHT2">XFSM_SACK_RIGHT2</option><option value="XFSM_TIMESTAMP">XFSM_TIMESTAMP</option><option value="XFSM_ZERO">XFSM_ZERO</option></select>';
+  cell4.innerHTML = '<input type="button" value="Delete action" onclick="DeleteRow(this)" class="btn btn-danger">';
+
+}
+
+function download(filename, text) {
+  var element = document.createElement('a');
+  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+  element.setAttribute('download', filename);
+
+  element.style.display = 'none';
+  document.body.appendChild(element);
+
+  element.click();
+
+  document.body.removeChild(element);
+}
+
+
+function tableToJSON() {
+  var output = document.getElementById("output");
+
+  var init = document.getElementById("initialstate");
+  var initNum = init.value;
+
+  var conditions = document.getElementById("conditions");
+  var conditionsList = [];
+  row, rows = conditions.rows;
+  for (var i=1, iLen=rows.length; i<iLen; i++) {
+      var obj = {};
+    row = rows[i];
+    obj[rows[0].cells[0].textContent] = row.cells[0].children[0].value;
+    obj[rows[0].cells[1].textContent] = row.cells[1].children[0].value;
+    obj[rows[0].cells[2].textContent] = row.cells[2].children[0].value;
+    obj[rows[0].cells[3].textContent] = row.cells[3].children[0].value;
+    conditionsList.push(obj);
+  }
+
+  var table = document.getElementById("table");
+  var tablelist = [];
+  var row, rows = table.rows;
+  for (var i=1, iLen=rows.length; i<iLen; i++) {
+      var obj = {};
+    row = rows[i];
+    obj[rows[0].cells[0].textContent] = row.cells[0].children[0].value;
+    obj[rows[0].cells[1].textContent] = row.cells[1].children[0].value;
+    obj[rows[0].cells[2].textContent] = row.cells[2].children[0].value;
+    obj[rows[0].cells[3].textContent] = row.cells[3].children[0].value;
+    obj[rows[0].cells[4].textContent] = row.cells[4].children[0].value;
+    
+    var actionRows = row.cells[5].children[0].rows;
+    var actionList = [];
+    for(var j = 1, jLen = actionRows.length; j < jLen; j++)
+    {
+      var action = {};
+
+      action[actionRows[0].cells[0].textContent] = actionRows[j].cells[0].children[0].value;
+      if(isAnUpdate(""+actionRows[j].cells[0].children[0].value))
+      {
+        action[actionRows[0].cells[1].textContent] = actionRows[j].cells[1].children[0].value;
+        action[actionRows[0].cells[2].textContent] = actionRows[j].cells[2].children[0].value;
+        action[actionRows[0].cells[3].textContent] = actionRows[j].cells[3].children[0].value;
+      }
+
+      actionList.push(action);
+    }
+
+    obj[rows[0].cells[5].textContent] = actionList;
+
+    tablelist.push(obj);
+  }
+
+  var json = {};
+  json["initialstate"] = initNum;
+  json["conditions"] = conditionsList;
+  json["table"] = tablelist;
+
+  output.innerHTML = JSON.stringify(json);
+
+  download('xfsm.json', JSON.stringify(json));
+}
+
+function DeleteRow(o) {
+  var p=o.parentNode.parentNode;
+  p.parentNode.removeChild(p);
+}
+</script>
+
+</body>
+</html>

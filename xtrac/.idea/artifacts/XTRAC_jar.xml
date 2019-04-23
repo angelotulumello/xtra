@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="XTRAC:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/XTRAC_jar</output-path>
+    <root id="archive" name="XTRAC.jar">
+      <element id="module-output" name="XTRAC" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/gson-2.6.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/antlr/antlr4-runtime/4.7/antlr4-runtime-4.7.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

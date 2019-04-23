@@ -1,0 +1,1692 @@
+{
+  "initialstate": "300",
+  "conditions": [
+    {
+      "id": "1",
+      "opcode": "XFSM_EQUAL",
+      "op0": "XFSM_SOCKETISCLOSED",
+      "op1": "1"
+    },
+    {
+      "id": "2",
+      "opcode": "XFSM_EQUAL",
+      "op0": "XFSM_BYTESTOTRANSMIT",
+      "op1": "0"
+    },
+    {
+      "id": "3",
+      "opcode": "XFSM_GREATER_EQ",
+      "op0": "XFSM_LASTACKEDSEQ",
+      "op1": "XFSM_HIGHTXMARK"
+    },
+    {
+      "id": "4",
+      "opcode": "XFSM_GREATER_EQ",
+      "op0": "XFSM_CONTEXT_PARAM0",
+      "op1": "XFSM_LASTACKEDSEQ"
+    },
+    {
+      "id": "5",
+      "opcode": "XFSM_GREATER",
+      "op0": "XFSM_AVAILABLE_WIN",
+      "op1": "0"
+    },
+    {
+      "id": "6",
+      "opcode": "XFSM_NOT_EQUAL",
+      "op0": "XFSM_CONTEXT_PARAM0",
+      "op1": "XFSM_LASTACKEDSEQ"
+    },
+    {
+      "id": "7",
+      "opcode": "XFSM_GREATER",
+      "op0": "XFSM_CONTEXT_PARAM1",
+      "op1": "XFSM_CUSTOM3"
+    },
+    {
+      "id": "8",
+      "opcode": "XFSM_LESS",
+      "op0": "XFSM_NEXTTXSEQ",
+      "op1": "XFSM_HIGHTXMARK"
+    },
+    {
+      "id": "9",
+      "opcode": "XFSM_EQUAL",
+      "op0": "XFSM_NEXTTXSEQ",
+      "op1": "XFSM_CONTEXT_PARAM0"
+    },
+    {
+      "id": "10",
+      "opcode": "XFSM_EQUAL",
+      "op0": "XFSM_CUSTOM6",
+      "op1": "1"
+    },
+    {
+      "id": "11",
+      "opcode": "XFSM_EQUAL",
+      "op0": "XFSM_CUSTOM2",
+      "op1": "0"
+    },
+    {
+      "id": "12",
+      "opcode": "XFSM_EQUAL",
+      "op0": "XFSM_CUSTOM2",
+      "op1": "1"
+    },
+    {
+      "id": "13",
+      "opcode": "XFSM_GREATER_EQ",
+      "op0": "XFSM_AVAILABLE_WIN",
+      "op1": "XFSM_SEGMENTSIZE"
+    }
+  ],
+  "table": [
+    {
+      "id": "0",
+      "condition_results": "XXXXXXXXXXXX",
+      "state": "300",
+      "event": "XFSM_CONNECT",
+      "next_state": "301",
+      "actions": [
+        {
+          "type": "XFSM_OR",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_FLAG_SYN",
+          "dest": "XFSM_TCPFLAGS"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "500000",
+          "dest": "XFSM_ARG2"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "1",
+          "dest": "XFSM_ARG0"
+        },
+        {
+          "type": "XFSM_SETTIMER"
+        },
+        {
+          "type": "XFSM_SENDEMPTYPACKET"
+        }
+      ]
+    },
+    {
+      "id": "1",
+      "condition_results": "XXXXXXXXXXXX",
+      "state": "301",
+      "event": "XFSM_TIMEOUT",
+      "next_state": "301",
+      "actions": [
+        {
+          "type": "XFSM_OR",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_FLAG_SYN",
+          "dest": "XFSM_TCPFLAGS"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "500000",
+          "dest": "XFSM_ARG2"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "1",
+          "dest": "XFSM_ARG0"
+        },
+        {
+          "type": "XFSM_SETTIMER"
+        },
+        {
+          "type": "XFSM_SENDEMPTYPACKET"
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "condition_results": "XXXXXXXXXXXX",
+      "state": "301",
+      "event": "XFSM_SYNACK",
+      "next_state": "0",
+      "actions": [
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "1",
+          "dest": "XFSM_ARG0"
+        },
+        {
+          "type": "XFSM_REMOVETIMER"
+        },
+        {
+          "type": "XFSM_OR",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_FLAG_ACK",
+          "dest": "XFSM_TCPFLAGS"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_NEXTTXSEQ",
+          "dest": "XFSM_ARG0"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "0",
+          "dest": "XFSM_ARG1"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "1",
+          "dest": "XFSM_ARG2"
+        },
+        {
+          "type": "XFSM_SETTIMER"
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "condition_results": "TTTXXXXXXXXX",
+      "state": "0",
+      "event": "XFSM_ACK",
+      "next_state": "304",
+      "actions": [
+        {
+          "type": "XFSM_OR",
+          "op0": "XFSM_NULL",
+          "op1": "XFSM_FLAG_FIN",
+          "dest": "XFSM_TCPFLAGS"
+        },
+        {
+          "type": "XFSM_MULTIPLY",
+          "op0": "XFSM_RTT",
+          "op1": "2",
+          "dest": "XFSM_ARG2"
+        },
+        {
+          "type": "XFSM_SETTIMER"
+        },
+        {
+          "type": "XFSM_SENDEMPTYPACKET"
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "condition_results": "TTTXXXXXXXXX",
+      "state": "1",
+      "event": "XFSM_ACK",
+      "next_state": "304",
+      "actions": [
+        {
+          "type": "XFSM_OR",
+          "op0": "XFSM_NULL",
+          "op1": "XFSM_FLAG_FIN",
+          "dest": "XFSM_TCPFLAGS"
+        },
+        {
+          "type": "XFSM_MULTIPLY",
+          "op0": "XFSM_RTT",
+          "op1": "2",
+          "dest": "XFSM_ARG2"
+        },
+        {
+          "type": "XFSM_SETTIMER"
+        },
+        {
+          "type": "XFSM_SENDEMPTYPACKET"
+        }
+      ]
+    },
+    {
+      "id": "5",
+      "condition_results": "TTTXXXXXXXXX",
+      "state": "2",
+      "event": "XFSM_ACK",
+      "next_state": "304",
+      "actions": [
+        {
+          "type": "XFSM_OR",
+          "op0": "XFSM_NULL",
+          "op1": "XFSM_FLAG_FIN",
+          "dest": "XFSM_TCPFLAGS"
+        },
+        {
+          "type": "XFSM_MULTIPLY",
+          "op0": "XFSM_RTT",
+          "op1": "2",
+          "dest": "XFSM_ARG2"
+        },
+        {
+          "type": "XFSM_SETTIMER"
+        },
+        {
+          "type": "XFSM_SENDEMPTYPACKET"
+        }
+      ]
+    },
+    {
+      "id": "6",
+      "condition_results": "TTTXXXXXXXXX",
+      "state": "3",
+      "event": "XFSM_ACK",
+      "next_state": "304",
+      "actions": [
+        {
+          "type": "XFSM_OR",
+          "op0": "XFSM_NULL",
+          "op1": "XFSM_FLAG_FIN",
+          "dest": "XFSM_TCPFLAGS"
+        },
+        {
+          "type": "XFSM_MULTIPLY",
+          "op0": "XFSM_RTT",
+          "op1": "2",
+          "dest": "XFSM_ARG2"
+        },
+        {
+          "type": "XFSM_SETTIMER"
+        },
+        {
+          "type": "XFSM_SENDEMPTYPACKET"
+        }
+      ]
+    },
+    {
+      "id": "7",
+      "condition_results": "TTTXXXXXXXXX",
+      "state": "0",
+      "event": "XFSM_TIMEOUT",
+      "next_state": "304",
+      "actions": [
+        {
+          "type": "XFSM_OR",
+          "op0": "XFSM_NULL",
+          "op1": "XFSM_FLAG_FIN",
+          "dest": "XFSM_TCPFLAGS"
+        },
+        {
+          "type": "XFSM_MULTIPLY",
+          "op0": "XFSM_RTT",
+          "op1": "2",
+          "dest": "XFSM_ARG2"
+        },
+        {
+          "type": "XFSM_SETTIMER"
+        },
+        {
+          "type": "XFSM_SENDEMPTYPACKET"
+        }
+      ]
+    },
+    {
+      "id": "8",
+      "condition_results": "TTTXXXXXXXXX",
+      "state": "1",
+      "event": "XFSM_TIMEOUT",
+      "next_state": "304",
+      "actions": [
+        {
+          "type": "XFSM_OR",
+          "op0": "XFSM_NULL",
+          "op1": "XFSM_FLAG_FIN",
+          "dest": "XFSM_TCPFLAGS"
+        },
+        {
+          "type": "XFSM_MULTIPLY",
+          "op0": "XFSM_RTT",
+          "op1": "2",
+          "dest": "XFSM_ARG2"
+        },
+        {
+          "type": "XFSM_SETTIMER"
+        },
+        {
+          "type": "XFSM_SENDEMPTYPACKET"
+        }
+      ]
+    },
+    {
+      "id": "9",
+      "condition_results": "TTTXXXXXXXXX",
+      "state": "2",
+      "event": "XFSM_TIMEOUT",
+      "next_state": "304",
+      "actions": [
+        {
+          "type": "XFSM_OR",
+          "op0": "XFSM_NULL",
+          "op1": "XFSM_FLAG_FIN",
+          "dest": "XFSM_TCPFLAGS"
+        },
+        {
+          "type": "XFSM_MULTIPLY",
+          "op0": "XFSM_RTT",
+          "op1": "2",
+          "dest": "XFSM_ARG2"
+        },
+        {
+          "type": "XFSM_SETTIMER"
+        },
+        {
+          "type": "XFSM_SENDEMPTYPACKET"
+        }
+      ]
+    },
+    {
+      "id": "10",
+      "condition_results": "TTTXXXXXXXXX",
+      "state": "3",
+      "event": "XFSM_TIMEOUT",
+      "next_state": "304",
+      "actions": [
+        {
+          "type": "XFSM_OR",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_FLAG_FIN",
+          "dest": "XFSM_TCPFLAGS"
+        },
+        {
+          "type": "XFSM_MULTIPLY",
+          "op0": "XFSM_RTT",
+          "op1": "2",
+          "dest": "XFSM_ARG2"
+        },
+        {
+          "type": "XFSM_SETTIMER"
+        },
+        {
+          "type": "XFSM_SENDEMPTYPACKET"
+        }
+      ]
+    },
+    {
+      "id": "11",
+      "condition_results": "XXXTXXXXXXXX",
+      "state": "304",
+      "event": "XFSM_ACK",
+      "next_state": "304",
+      "actions": [
+        {
+          "type": "XFSM_OR",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_FLAG_FIN",
+          "dest": "XFSM_TCPFLAGS"
+        },
+        {
+          "type": "XFSM_MULTIPLY",
+          "op0": "XFSM_RTT",
+          "op1": "2",
+          "dest": "XFSM_ARG2"
+        },
+        {
+          "type": "XFSM_SETTIMER"
+        },
+        {
+          "type": "XFSM_SENDEMPTYPACKET"
+        }
+      ]
+    },
+    {
+      "id": "12",
+      "condition_results": "XXXXXXXXXXXX",
+      "state": "304",
+      "event": "XFSM_ACK",
+      "next_state": "305",
+      "actions": []
+    },
+    {
+      "id": "13",
+      "condition_results": "XXXXXXXXXXXX",
+      "state": "304",
+      "event": "XFSM_FINACK",
+      "next_state": "306",
+      "actions": [
+        {
+          "type": "XFSM_OR",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_FLAG_ACK",
+          "dest": "XFSM_TCPFLAGS"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "120000000",
+          "dest": "XFSM_ARG2"
+        },
+        {
+          "type": "XFSM_SETTIMER"
+        },
+        {
+          "type": "XFSM_SENDEMPTYPACKET"
+        }
+      ]
+    },
+    {
+      "id": "14",
+      "condition_results": "XXXXXXXXXXXX",
+      "state": "306",
+      "event": "XFSM_TIMEOUT",
+      "next_state": "300",
+      "actions": [
+        {
+          "type": "XFSM_CLOSESOCKET"
+        }
+      ]
+    },
+    {
+      "id": "15",
+      "condition_results": "XXXXTXXXXXXX",
+      "state": "0",
+      "event": "XFSM_TIMEOUT",
+      "next_state": "0",
+      "actions": [
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_NEXTTXSEQ",
+          "dest": "XFSM_ARG0"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "1",
+          "dest": "XFSM_ARG1"
+        },
+        {
+          "type": "XFSM_MULTIPLY",
+          "op0": "XFSM_RTT",
+          "op1": "2",
+          "dest": "XFSM_ARG2"
+        },
+        {
+          "type": "XFSM_SETTIMER"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_NULL",
+          "op1": "",
+          "dest": "XFSM_NULL"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_NULL",
+          "op1": "",
+          "dest": "XFSM_NULL"
+        },
+        {
+          "type": "XFSM_SENDPCKT"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_NEXTTXSEQ",
+          "op1": "XFSM_SEGMENTSIZE",
+          "dest": "XFSM_NEXTTXSEQ"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_HIGHTXMARK",
+          "op1": "XFSM_SEGMENTSIZE",
+          "dest": "XFSM_HIGHTXMARK"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_NEXTTXSEQ",
+          "dest": "XFSM_ARG0"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "0",
+          "dest": "XFSM_ARG1"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "1",
+          "dest": "XFSM_ARG2"
+        },
+        {
+          "type": "XFSM_SETTIMER"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_CWND",
+          "op1": "XFSM_LASTACKEDSEQ",
+          "dest": "XFSM_AVAILABLE_WIN"
+        },
+        {
+          "type": "XFSM_MINUS",
+          "op0": "XFSM_AVAILABLE_WIN",
+          "op1": "XFSM_HIGHTXMARK",
+          "dest": "XFSM_AVAILABLE_WIN"
+        }
+      ]
+    },
+    {
+      "id": "16",
+      "condition_results": "XXXXXTXXXXXX",
+      "state": "0",
+      "event": "XFSM_ACK",
+      "next_state": "0",
+      "actions": [
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_CWND",
+          "op1": "XFSM_SEGMENTSIZE",
+          "dest": "XFSM_CWND"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_CONTEXT_PARAM0",
+          "dest": "XFSM_LASTACKEDSEQ"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_NEXTTXSEQ",
+          "op1": "0",
+          "dest": "XFSM_ARG0"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "0",
+          "dest": "XFSM_ARG1"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "1000000",
+          "dest": "XFSM_ARG2"
+        },
+        {
+          "type": "XFSM_MINUS",
+          "op0": "XFSM_TIMESTAMP",
+          "op1": "XFSM_RCVTIMESTAMPVALUEECHOREPLY",
+          "dest": "XFSM_RTT"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_CWND",
+          "op1": "XFSM_LASTACKEDSEQ",
+          "dest": "XFSM_AVAILABLE_WIN"
+        },
+        {
+          "type": "XFSM_MINUS",
+          "op0": "XFSM_AVAILABLE_WIN",
+          "op1": "XFSM_HIGHTXMARK",
+          "dest": "XFSM_AVAILABLE_WIN"
+        }
+      ]
+    },
+    {
+      "id": "17",
+      "condition_results": "XXTXXTXXXXXX",
+      "state": "0",
+      "event": "XFSM_TIMEOUT",
+      "next_state": "1",
+      "actions": [
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_CWND",
+          "dest": "XFSM_CUSTOM0"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_TIMESTAMP",
+          "dest": "XFSM_CUSTOM1"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "0",
+          "dest": "XFSM_CUSTOM2"
+        },
+        {
+          "type": "XFSM_DIVIDE",
+          "op0": "XFSM_CWND",
+          "op1": "2",
+          "dest": "XFSM_CWND"
+        },
+        {
+          "type": "XFSM_DIVIDE",
+          "op0": "XFSM_CWND",
+          "op1": "XFSM_SEGMENTSIZE",
+          "dest": "XFSM_CUSTOM7"
+        },
+        {
+          "type": "XFSM_DIVIDE",
+          "op0": "XFSM_RTT",
+          "op1": "XFSM_CUSTOM7",
+          "dest": "XFSM_CUSTOM4"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_LASTACKEDSEQ",
+          "dest": "XFSM_NEXTTXSEQ"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_NEXTTXSEQ",
+          "dest": "XFSM_ARG0"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_ZERO",
+          "dest": "XFSM_ARG1"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_CUSTOM4",
+          "dest": "XFSM_ARG2"
+        },
+        {
+          "type": "XFSM_SETTIMER"
+        }
+      ]
+    },
+    {
+      "id": "18",
+      "condition_results": "XXTXXTXXXXXX",
+      "state": "1",
+      "event": "XFSM_TIMEOUT",
+      "next_state": "1",
+      "actions": [
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_CWND",
+          "dest": "XFSM_CUSTOM0"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_TIMESTAMP",
+          "dest": "XFSM_CUSTOM1"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "0",
+          "dest": "XFSM_CUSTOM2"
+        },
+        {
+          "type": "XFSM_DIVIDE",
+          "op0": "XFSM_CWND",
+          "op1": "2",
+          "dest": "XFSM_CWND"
+        },
+        {
+          "type": "XFSM_DIVIDE",
+          "op0": "XFSM_CWND",
+          "op1": "XFSM_SEGMENTSIZE",
+          "dest": "XFSM_CUSTOM7"
+        },
+        {
+          "type": "XFSM_DIVIDE",
+          "op0": "XFSM_RTT",
+          "op1": "XFSM_CUSTOM7",
+          "dest": "XFSM_CUSTOM4"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_LASTACKEDSEQ",
+          "dest": "XFSM_NEXTTXSEQ"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_NEXTTXSEQ",
+          "dest": "XFSM_ARG0"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_ZERO",
+          "dest": "XFSM_ARG1"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_CUSTOM4",
+          "dest": "XFSM_ARG2"
+        },
+        {
+          "type": "XFSM_SETTIMER"
+        }
+      ]
+    },
+    {
+      "id": "19",
+      "condition_results": "XXXXXXTTXXXX",
+      "state": "1",
+      "event": "XFSM_TIMEOUT",
+      "next_state": "1",
+      "actions": [
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_NEXTTXSEQ",
+          "dest": "XFSM_ARG0"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_SEGMENTSIZE",
+          "dest": "XFSM_ARG1"
+        },
+        {
+          "type": "XFSM_SENDPCKT"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_NEXTTXSEQ",
+          "op1": "XFSM_SEGMENTSIZE",
+          "dest": "XFSM_NEXTTXSEQ"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_CONTEXT_PARAM0",
+          "dest": "XFSM_ARG0"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_ZERO",
+          "dest": "XFSM_ARG1"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_CUSTOM4",
+          "dest": "XFSM_ARG2"
+        },
+        {
+          "type": "XFSM_SETTIMER"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_NEXTTXSEQ",
+          "dest": "XFSM_ARG0"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_CUSTOM3",
+          "op1": "1",
+          "dest": "XFSM_ARG1"
+        },
+        {
+          "type": "XFSM_MULTIPLY",
+          "op0": "XFSM_RTT",
+          "op1": "2",
+          "dest": "XFSM_ARG1"
+        },
+        {
+          "type": "XFSM_SETTIMER"
+        }
+      ]
+    },
+    {
+      "id": "20",
+      "condition_results": "XXXXXXFXXXXX",
+      "state": "1",
+      "event": "XFSM_TIMEOUT",
+      "next_state": "1",
+      "actions": [
+        {
+          "type": "XFSM_DIVIDE",
+          "op0": "XFSM_CWND",
+          "op1": "XFSM_SEGMENTSIZE",
+          "dest": "XFSM_CUSTOM5"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_CUSTOM5",
+          "op1": "1",
+          "dest": "XFSM_CUSTOM5"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_CONTEXT_PARAM0",
+          "dest": "XFSM_ARG0"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_ZERO",
+          "dest": "XFSM_ARG1"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_CUSTOM4",
+          "dest": "XFSM_ARG2"
+        },
+        {
+          "type": "XFSM_SETTIMER"
+        }
+      ]
+    },
+    {
+      "id": "21",
+      "condition_results": "XXXXXXFXXXXX",
+      "state": "1",
+      "event": "XFSM_ACK",
+      "next_state": "2",
+      "actions": [
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_ZERO",
+          "dest": "XFSM_CUSTOM3"
+        },
+        {
+          "type": "XFSM_DIVIDE",
+          "op0": "XFSM_CWND",
+          "op1": "XFSM_SEGMENTSIZE",
+          "dest": "XFSM_CUSTOM5"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_CUSTOM5",
+          "op1": "1",
+          "dest": "XFSM_CUSTOM5"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_CONTEXT_PARAM0",
+          "dest": "XFSM_ARG0"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_ZERO",
+          "dest": "XFSM_ARG1"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_CUSTOM4",
+          "dest": "XFSM_ARG2"
+        },
+        {
+          "type": "XFSM_SETTIMER"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_NEXTTXSEQ",
+          "dest": "XFSM_ARG0"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_CUSTOM3",
+          "dest": "XFSM_ARG1"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ARG1",
+          "op1": "1",
+          "dest": "XFSM_ARG1"
+        },
+        {
+          "type": "XFSM_MULTIPLY",
+          "op0": "XFSM_RTT",
+          "op1": "2",
+          "dest": "XFSM_ARG2"
+        },
+        {
+          "type": "XFSM_SETTIMER"
+        },
+        {
+          "type": "XFSM_MINUS",
+          "op0": "XFSM_TIMESTAMP",
+          "op1": "XFSM_RCVTIMESTAMPVALUEECHOREPLY",
+          "dest": "XFSM_RTT"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_CONTEXT_PARAM0",
+          "dest": "XFSM_LASTACKEDSEQ"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_CWND",
+          "op1": "XFSM_LASTACKEDSEQ",
+          "dest": "XFSM_AVAILABLE_WIN"
+        },
+        {
+          "type": "XFSM_MINUS",
+          "op0": "XFSM_AVAILABLE_WIN",
+          "op1": "XFSM_HIGHTXMARK",
+          "dest": "XFSM_AVAILABLE_WIN"
+        }
+      ]
+    },
+    {
+      "id": "22",
+      "condition_results": "XXXXXXFXXXXX",
+      "state": "1",
+      "event": "XFSM_SACK",
+      "next_state": "2",
+      "actions": [
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_ZERO",
+          "dest": "XFSM_CUSTOM3"
+        },
+        {
+          "type": "XFSM_DIVIDE",
+          "op0": "XFSM_CWND",
+          "op1": "XFSM_SEGMENTSIZE",
+          "dest": "XFSM_CUSTOM5"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_CUSTOM5",
+          "op1": "1",
+          "dest": "XFSM_CUSTOM5"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_CONTEXT_PARAM0",
+          "dest": "XFSM_ARG0"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_ZERO",
+          "dest": "XFSM_ARG1"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_CUSTOM4",
+          "dest": "XFSM_ARG2"
+        },
+        {
+          "type": "XFSM_SETTIMER"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_NEXTTXSEQ",
+          "dest": "XFSM_ARG0"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_CUSTOM3",
+          "dest": "XFSM_ARG1"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ARG1",
+          "op1": "1",
+          "dest": "XFSM_ARG1"
+        },
+        {
+          "type": "XFSM_MULTIPLY",
+          "op0": "XFSM_RTT",
+          "op1": "2",
+          "dest": "XFSM_ARG2"
+        },
+        {
+          "type": "XFSM_SETTIMER"
+        },
+        {
+          "type": "XFSM_MINUS",
+          "op0": "XFSM_TIMESTAMP",
+          "op1": "XFSM_RCVTIMESTAMPVALUEECHOREPLY",
+          "dest": "XFSM_RTT"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_CONTEXT_PARAM0",
+          "dest": "XFSM_LASTACKEDSEQ"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_CWND",
+          "op1": "XFSM_LASTACKEDSEQ",
+          "dest": "XFSM_AVAILABLE_WIN"
+        },
+        {
+          "type": "XFSM_MINUS",
+          "op0": "XFSM_AVAILABLE_WIN",
+          "op1": "XFSM_HIGHTXMARK",
+          "dest": "XFSM_AVAILABLE_WIN"
+        }
+      ]
+    },
+    {
+      "id": "23",
+      "condition_results": "XXXXXXFTXXXX",
+      "state": "1",
+      "event": "XFSM_ACK",
+      "next_state": "2",
+      "actions": [
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_ZERO",
+          "dest": "XFSM_CUSTOM3"
+        },
+        {
+          "type": "XFSM_DIVIDE",
+          "op0": "XFSM_CWND",
+          "op1": "XFSM_SEGMENTSIZE",
+          "dest": "XFSM_CUSTOM5"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_CUSTOM5",
+          "op1": "1",
+          "dest": "XFSM_CUSTOM5"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_CONTEXT_PARAM0",
+          "dest": "XFSM_ARG0"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_ZERO",
+          "dest": "XFSM_ARG1"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_CUSTOM4",
+          "dest": "XFSM_ARG2"
+        },
+        {
+          "type": "XFSM_SETTIMER"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_NEXTTXSEQ",
+          "dest": "XFSM_ARG0"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_CUSTOM3",
+          "dest": "XFSM_ARG1"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ARG1",
+          "op1": "1",
+          "dest": "XFSM_ARG1"
+        },
+        {
+          "type": "XFSM_MULTIPLY",
+          "op0": "XFSM_RTT",
+          "op1": "2",
+          "dest": "XFSM_ARG2"
+        },
+        {
+          "type": "XFSM_SETTIMER"
+        },
+        {
+          "type": "XFSM_MINUS",
+          "op0": "XFSM_TIMESTAMP",
+          "op1": "XFSM_RCVTIMESTAMPVALUEECHOREPLY",
+          "dest": "XFSM_RTT"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_CONTEXT_PARAM0",
+          "dest": "XFSM_LASTACKEDSEQ"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_CWND",
+          "op1": "XFSM_LASTACKEDSEQ",
+          "dest": "XFSM_AVAILABLE_WIN"
+        },
+        {
+          "type": "XFSM_MINUS",
+          "op0": "XFSM_AVAILABLE_WIN",
+          "op1": "XFSM_HIGHTXMARK",
+          "dest": "XFSM_AVAILABLE_WIN"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_CUSTOM0",
+          "dest": "XFSM_CWND"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_ZERO",
+          "dest": "XFSM_CUSTOM1"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "1",
+          "dest": "XFSM_CUSTOM6"
+        }
+      ]
+    },
+    {
+      "id": "24",
+      "condition_results": "XXXXXXXXXXXX",
+      "state": "1",
+      "event": "XFSM_SACK",
+      "next_state": "1",
+      "actions": [
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_SACK_LEFT0",
+          "op1": "XFSM_ZERO",
+          "dest": "\nXFSM_ARG0"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_SACK_RIGHT0",
+          "op1": "XFSM_ZERO",
+          "dest": "XFSM_ARG1"
+        },
+        {
+          "type": "XFSM_REMOVETIMERS"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_SACK_LEFT1",
+          "op1": "XFSM_ZERO",
+          "dest": "\nXFSM_ARG0"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_SACK_RIGHT1",
+          "op1": "XFSM_ZERO",
+          "dest": "XFSM_ARG1"
+        },
+        {
+          "type": "XFSM_REMOVETIMERS"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_SACK_LEFT2",
+          "op1": "XFSM_ZERO",
+          "dest": "\nXFSM_ARG0"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_SACK_RIGHT2",
+          "op1": "XFSM_ZERO",
+          "dest": "XFSM_ARG1"
+        },
+        {
+          "type": "XFSM_REMOVETIMERS"
+        }
+      ]
+    },
+    {
+      "id": "25",
+      "condition_results": "XXXTXXXTXXXX",
+      "state": "2",
+      "event": "XFSM_TIMEOUT",
+      "next_state": "2",
+      "actions": [
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_NEXTTXSEQ",
+          "op1": "XFSM_ZERO",
+          "dest": "XFSM_ARG0"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_SEGMENTSIZE",
+          "op1": "XFSM_ZERO",
+          "dest": "XFSM_ARG1"
+        },
+        {
+          "type": "XFSM_SENDPCKT"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_NEXTTXSEQ",
+          "op1": "XFSM_SEGMENTSIZE",
+          "dest": "XFSM_NEXTTXSEQ"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_HIGHTXMARK",
+          "op1": "XFSM_SEGMENTSIZE",
+          "dest": "XFSM_HIGHTXMARK"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_CUSTOM5",
+          "op1": "1",
+          "dest": "XFSM_CUSTOM5"
+        },
+        {
+          "type": "XFSM_DIVIDE",
+          "op0": "XFSM_RTT",
+          "op1": "XFSM_CUSTOM5",
+          "dest": "XFSM_CUSTOM4"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_NEXTTXSEQ",
+          "dest": "XFSM_ARG0"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_ZERO",
+          "dest": "XFSM_ARG1"
+        },
+        {
+          "type": "XFSM_ADD",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_CUSTOM4",
+          "dest": "XFSM_ARG2"
+        },
+        {
+          "type": "XFSM_SETTIMER"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_CWND",
+          "op1": "XFSM_LASTACKEDSEQ",
+          "dest": "XFSM_AVAILABLE_WIN"
+        },
+        {
+          "type": "XFSM_MINUS",
+          "op0": "XFSM_AVAILABLE_WIN",
+          "op1": "XFSM_HIGHTXMARK",
+          "dest": "XFSM_AVAILABLE_WIN"
+        }
+      ]
+    },
+    {
+      "id": "26",
+      "condition_results": "XXXXTXXXXXXX",
+      "state": "2",
+      "event": "XFSM_ACK",
+      "next_state": "2",
+      "actions": [
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_CONTEXT_PARAM0",
+          "op1": "XFSM_ZERO",
+          "dest": "XFSM_LASTACKEDSEQ"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_CWND",
+          "op1": "XFSM_LASTACKEDSEQ",
+          "dest": "XFSM_AVAILABLE_WIN"
+        },
+        {
+          "type": "XFSM_MINUS",
+          "op0": "XFSM_AVAILABLE_WIN",
+          "op1": "XFSM_HIGHTXMARK",
+          "dest": "XFSM_AVAILABLE_WIN"
+        },
+        {
+          "type": "XFSM_MINUS",
+          "op0": "XFSM_TIMESTAMP",
+          "op1": "XFSM_RCVTIMESTAMPVALUEECHOREPLY",
+          "dest": "XFSM_RTT"
+        }
+      ]
+    },
+    {
+      "id": "27",
+      "condition_results": "XXXXXXXXTTXX",
+      "state": "2",
+      "event": "XFSM_TIMEOUT",
+      "next_state": "3",
+      "actions": [
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_ZERO",
+          "dest": "XFSM_CUSTOM6"
+        }
+      ]
+    },
+    {
+      "id": "27",
+      "condition_results": "XXXXXXXXTXTX",
+      "state": "2",
+      "event": "XFSM_TIMEOUT",
+      "next_state": "0",
+      "actions": [
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_ZERO",
+          "dest": "XFSM_CUSTOM6"
+        }
+      ]
+    },
+    {
+      "id": "29",
+      "condition_results": "XXXXTXXXXXXX",
+      "state": "3",
+      "event": "XFSM_ACK",
+      "next_state": "3",
+      "actions": [
+        {
+          "type": "XFSM_DIVIDE",
+          "op0": "XFSM_SEGMENTSIZE",
+          "op1": "XFSM_CWND",
+          "dest": "XFSM_CUSTOM7"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_CUSTOM7",
+          "op1": "XFSM_CWND",
+          "dest": "XFSM_CWND"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_CONTEXT_PARAM0",
+          "dest": "XFSM_LASTACKEDSEQ"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_NEXTTXSEQ",
+          "dest": "XFSM_ARG0"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_CUSTOM3",
+          "op1": "1",
+          "dest": "XFSM_ARG1"
+        },
+        {
+          "type": "XFSM_MULTIPLY",
+          "op0": "XFSM_RTT",
+          "op1": "2",
+          "dest": "XFSM_ARG2"
+        },
+        {
+          "type": "XFSM_SETTIMER"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_NEXTTXSEQ",
+          "dest": "XFSM_ARG0"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_SEGMENTSIZE",
+          "dest": "XFSM_ARG1"
+        },
+        {
+          "type": "XFSM_SENDPCKT"
+        },
+        {
+          "type": "XFSM_MINUS",
+          "op0": "XFSM_TIMESTAMP",
+          "op1": "XFSM_RCVTIMESTAMPVALUEECHOREPLY",
+          "dest": "XFSM_RTT"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_NEXTTXSEQ",
+          "op1": "XFSM_SEGMENTSIZE",
+          "dest": "XFSM_NEXTTXSEQ"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_HIGHTXMARK",
+          "op1": "XFSM_SEGMENTSIZE",
+          "dest": "XFSM_HIGHTXMARK"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_NEXTTXSEQ",
+          "op1": "XFSM_ZERO",
+          "dest": "XFSM_ARG0"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_ZERO",
+          "dest": "XFSM_ARG1"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "1",
+          "dest": "XFSM_ARG2"
+        },
+        {
+          "type": "XFSM_SETTIMER"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_CWND",
+          "op1": "XFSM_LASTACKEDSEQ",
+          "dest": "XFSM_AVAILABLE_WIN"
+        },
+        {
+          "type": "XFSM_MINUS",
+          "op0": "XFSM_AVAILABLE_WIN",
+          "op1": "XFSM_HIGHTXMARK",
+          "dest": "XFSM_HIGHTXMARK"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "1",
+          "dest": "XFSM_CUSTOM2"
+        }
+      ]
+    },
+    {
+      "id": "30",
+      "condition_results": "XXXXXXXXXXXT",
+      "state": "3",
+      "event": "XFSM_TIMEOUT",
+      "next_state": "3",
+      "actions": [
+        {
+          "type": "XFSM_DIVIDE",
+          "op0": "XFSM_SEGMENTSIZE",
+          "op1": "XFSM_CWND",
+          "dest": "XFSM_CUSTOM7"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_NEXTTXSEQ",
+          "op1": "XFSM_ZERO",
+          "dest": "XFSM_ARG0"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_SEGMENTSIZE",
+          "dest": "XFSM_ARG1"
+        },
+        {
+          "type": "XFSM_SENDPCKT"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_NEXTTXSEQ",
+          "dest": "XFSM_ARG0"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "1",
+          "dest": "XFSM_ARG1"
+        },
+        {
+          "type": "XFSM_MULTIPLY",
+          "op0": "XFSM_RTT",
+          "op1": "2",
+          "dest": "XFSM_ARG2"
+        },
+        {
+          "type": "XFSM_SETTIMER"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_SEGMENTSIZE",
+          "op1": "XFSM_NEXTTXSEQ",
+          "dest": "XFSM_NEXTTXSEQ"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_HIGHTXMARK",
+          "op1": "XFSM_SEGMENTSIZE",
+          "dest": "XFSM_HIGHTXMARK"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_NEXTTXSEQ",
+          "op1": "XFSM_ZERO",
+          "dest": "XFSM_ARG0"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_ZERO",
+          "dest": "XFSM_ARG1"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "1",
+          "dest": "XFSM_ARG2"
+        },
+        {
+          "type": "XFSM_SETTIMER"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_CWND",
+          "op1": "XFSM_LASTACKEDSEQ",
+          "dest": "XFSM_AVAILABLE_WIN"
+        },
+        {
+          "type": "XFSM_MINUS",
+          "op0": "XFSM_AVAILABLE_WIN",
+          "op1": "XFSM_HIGHTXMARK",
+          "dest": "XFSM_HIGHTXMARK"
+        }
+      ]
+    },
+    {
+      "id": "18",
+      "condition_results": "XXTXXTXXXXXX",
+      "state": "3",
+      "event": "XFSM_TIMEOUT",
+      "next_state": "1",
+      "actions": [
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_CWND",
+          "dest": "XFSM_CUSTOM0"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_TIMESTAMP",
+          "dest": "XFSM_CUSTOM1"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "0",
+          "dest": "XFSM_CUSTOM2"
+        },
+        {
+          "type": "XFSM_DIVIDE",
+          "op0": "XFSM_CWND",
+          "op1": "2",
+          "dest": "XFSM_CWND"
+        },
+        {
+          "type": "XFSM_DIVIDE",
+          "op0": "XFSM_CWND",
+          "op1": "XFSM_SEGMENTSIZE",
+          "dest": "XFSM_CUSTOM7"
+        },
+        {
+          "type": "XFSM_DIVIDE",
+          "op0": "XFSM_RTT",
+          "op1": "XFSM_CUSTOM7",
+          "dest": "XFSM_CUSTOM4"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_LASTACKEDSEQ",
+          "dest": "XFSM_NEXTTXSEQ"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_NEXTTXSEQ",
+          "dest": "XFSM_ARG0"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_ZERO",
+          "dest": "XFSM_ARG1"
+        },
+        {
+          "type": "XFSM_SUM",
+          "op0": "XFSM_ZERO",
+          "op1": "XFSM_CUSTOM4",
+          "dest": "XFSM_ARG2"
+        },
+        {
+          "type": "XFSM_SETTIMER"
+        }
+      ]
+    }
+  ]
+}

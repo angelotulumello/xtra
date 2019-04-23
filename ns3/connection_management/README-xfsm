@@ -1,0 +1,10 @@
+The XFSM implementation on ns-3 consists of two different branches:
+	master: implements the congestion control part (once the connection is established)
+	connection_management: consists of the congestion control part plus the connection setup and closing part
+
+You can find some examples in the "scratch" directory along with the parser from JSON to C++ code.
+First, you have to download the ns-3.27 version (at https://www.nsnam.org/ns-3-27/ there's a link for the download, you can use GitHub too at https://github.com/nsnam/ns-3-dev-git), and then use "ns-3.27" as your root directory.
+Before compiling, you need to add the files from the branch that you wish to use, placing them in your ns-3.27 folder using the same path as you see in this repo.
+To build and run the examples, please refer to the available README file from ns-3.
+In order to write your own transport protocol, you can either use the HTML editor and parse the generated JSON file when setting the XFSM or refer to the hardcoded versions in the "scratch" directory. In the first case, you should put your JSON file in the main ns-3.27 directory. Then include "parser.h" in your test and get your Xfsm struct by calling the GetXfsm(filename) function (remember to pass here your JSON filename as a parameter). Then, assign the Xfsm to the TcpSocketBase using SetXfsm(), as you can see in the "teb3-json.cc" example.
+In the second case, you can hardcode all the conditions, table entries and actions directly in C++ code and set the Xfsm using the SetXfsm() function.
