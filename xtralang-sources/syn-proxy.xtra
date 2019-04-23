@@ -1,0 +1,90 @@
+Register temp1, diff;
+
+Action reply {
+	//switch ports
+	temp1 = tcp.sport;
+	setField(tcp.sport, 255, tcp.dport);
+	setField(tcp.dport, 255, temp1);
+
+	//switch IPs
+	temp1 = ipv4.src;
+	setField(ipv4.src, 255, ipv4.dst);
+	setField(ipv4.dst, 255, temp1);
+	
+	//switch MAC addresses
+	temp1 = eth.src;
+	setField(eth.src, 255, eth.dst);
+	setField(eth.dst, 255, temp1);
+}
+
+Action set_ackno {
+	temp1 = tcp.seqNo + 1;
+	setField(tcp.ackNo, 255, temp1);
+}
+
+
+State initial init {
+	on (pktRcvd) {
+	//Syn packet coming from the external interface
+		if (tcp.flags == 2, pktRcvd.port == 1) {
+			storePacket(0);
+			reply();
+			set_ackno();
+			// We always reply with a sequence number of 1234
+			setField(tcp.seqNo, 255, 1234);
+			//Setting the SynAck flag
+			setField(tcp.flags, 255, 18);
+			sendPacket(255, 1);
+			setTimer(1, 500000000, 1);
+			setNextState(syn_rcvd);
+		}
+	}
+}
+
+State syn_rcvd {
+	on (pktRcvd) {
+	//We have an Ack coming from the external interface
+		if (tcp.flags == 16, pktRcvd.port == 1) {
+			sendPacket(0, 2);
+			setNextState(syn_sent_to_server);
+		}
+	}
+	on (timeout) {
+		//There was no answer from the client, so delete the XFSM instance
+	}
+}
+
+State syn_sent_to_server {
+	on (pktRcvd) {
+		if (tcp.flags == 18, pktRcvd.port == 2) {
+	//We have a SynAck coming from the internal interface
+			reply();
+			diff = 1234 - tcp.seqNo;
+			temp1 = tcp.ackNo;
+			set_ackno();
+			setField(tcp.seqNo, 255, temp1);
+			setField(tcp.flags, 255, 16);
+			sendPacket(255, 2);
+			setNextState(forward);
+		}
+	}
+}
+
+
+State forward {
+	on (pktRcvd) {
+		//ACK coming form external interface
+		if (tcp.flags == 16, pktRcvd.port == 1) {
+			temp1 = tcp.ackNo - diff;
+			setField(tcp.ackNo, 255, temp1);
+			sendPacket(255, 2);
+		}
+		//ACK coming form internal interface
+
+		if (tcp.flags == 16, pktRcvd.port == 2) {
+			temp1 = tcp.seqNo + diff;
+			setField(tcp.seqNo, 255, temp1);
+			sendPacket(255, 1);
+		}
+	}
+}

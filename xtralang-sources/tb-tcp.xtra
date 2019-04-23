@@ -1,0 +1,182 @@
+Register remoteSeq, lastAckedSeq, cwnd, availWin, highTxMark, nextTxSeq, rtt, rttDoubled, currentRetxRound, pacingTime, pktsToPace, cwndIncr;
+
+// Macro actions definition
+Action sendDataPkt {
+	setField(tcp.seqNo, 2, nextTxSeq);
+	setField(tcp.ackNo, 2, remoteSeq);
+	setField(tcp.timestamp, 2, currentTime);
+    sendPacket(2, 1);
+}
+
+Action sendAndUpdate {
+	sendDataPkt();
+	//highTxMark = nextTxSeq;
+	nextTxSeq = nextTxSeq + 1448;
+}
+
+Action sendAndUpdateWithTimeout {
+	rttDoubled = rtt*2;
+	setTimer(nextTxSeq, 1, rttDoubled);
+	sendAndUpdate();
+}
+
+Action initPacing {
+	cwnd = cwnd/2;
+	pktsToPace = cwnd/1448;
+	pacingTime = rtt/pktsToPace;
+	nextTxSeq = lastAckedSeq;
+	setTimer(nextTxSeq, 0, pacingTime);
+	setNextState(recoveryPacing);
+}
+
+Action updateAvailWin {
+	availWin = highTxMark - lastAckedSeq;
+	availWin = cwnd - availWin;
+}
+
+Action updatePacing {
+	pktsToPace = pktsToPace + 1;
+	pacingTime = rtt/pktsToPace;
+	setTimer(nextTxSeq, 0, pacingTime);
+}
+
+// Connection estabilishment && XFSM initialization
+State initial init {
+	nextTxSeq = 1;
+	highTxMark = 1;
+	lastAckedSeq = 1;
+	cwnd = 5792; // 1448*4
+	availWin = 0;
+	rtt = 10;
+
+	setField(tcp.flags, 1, 2);
+	setField(tcp.seqNo, 1, 0);
+	setField(tcp.timestamp, 1, currentTime);
+	setTimer(1, 1, 3000000);
+	setNextState(syn);
+}
+
+State syn {
+	on (timeout) {
+		sendPacket(1, 1);
+		setNextState(ack);
+	}
+}
+
+State ack {
+	on (pktRcvd){
+		if (tcp.flags > 2, tcp.ackNo >= lastAckedSeq) {
+			lastAckedSeq = tcp.ackNo;
+			remoteSeq = tcp.seqNo + 1;
+			setField(tcp.flags, 1, 16);
+			setField(tcp.ackNo, 1, remoteSeq);
+			setField(tcp.seqNo, 1, nextTxSeq);
+			sendPacket(1, 1);
+
+			sendAndUpdate();
+			sendAndUpdate();
+			sendAndUpdate();
+			highTxMark = 1448*3;
+			highTxMark = highTxMark + 1;
+			nextTxSeq = highTxMark;
+
+			setNextState(slowStart);
+		} 
+	}
+	on (timeout) {
+		setNextState(init);
+	}
+}
+
+// From here starts congestion control
+State slowStart {
+	on(timeout) {
+		if (timeout.data1 <= 0, availWin > 0) {
+			sendAndUpdateWithTimeout();
+			highTxMark = nextTxSeq + 1448;
+			setTimer(nextTxSeq, 0, 1);
+			updateAvailWin();
+		}
+		if (timeout.data1 > 0, timeout.data0 >= lastAckedSeq, currentRetxRound < timeout.data1) {
+			currentRetxRound = currentRetxRound + 1;
+			initPacing();
+		}
+	}
+	on(pktRcvd) {		
+		if (tcp.flags > 2, lastAckedSeq != tcp.ackNo) {
+			cwnd = cwnd + 1448;
+			lastAckedSeq = tcp.ackNo;
+		    setTimer(nextTxSeq, 0, 1);
+		    rtt = max(rtt, tcp.timestampEchoReply);
+   			updateAvailWin();
+		}
+	}
+}
+
+State recoveryPacing {
+	on(timeout) {
+		if (timeout.data1 <= 0, nextTxSeq < highTxMark, timeout.data0 == nextTxSeq) {
+			sendAndUpdate();
+			setTimer(nextTxSeq, 0, pacingTime);
+		}
+	}
+	on(pktRcvd) {
+		if (tcp.flags > 2, nextTxSeq >= highTxMark) {
+			currentRetxRound = currentRetxRound - 1;
+			updatePacing();
+			lastAckedSeq = tcp.ackNo;
+		   	updateAvailWin();
+
+			setNextState(postRecovery);
+		}
+	}
+}
+
+State postRecovery {
+	on(timeout) {
+		if (timeout.data1 <= 0, availWin > 0, timeout.data0 == nextTxSeq) {
+			sendAndUpdate();
+			highTxMark = nextTxSeq + 1448;
+			updatePacing();
+			updateAvailWin();
+		}
+		if (timeout.data1 <= 0, availWin <= 0, timeout.data0 == nextTxSeq) {
+			setNextState(linearIncrease);
+		}
+	}
+	on(pktRcvd) {
+		if (tcp.flags > 2, lastAckedSeq != tcp.ackNo) {
+			lastAckedSeq = tcp.ackNo;
+			updateAvailWin();
+		}
+	}
+}
+
+State linearIncrease {
+	on(pktRcvd) {
+		if (tcp.flags > 2, lastAckedSeq != tcp.ackNo) {
+			cwndIncr = 2096704; // 1448*1448
+			cwndIncr = cwndIncr/cwnd;
+			cwnd = cwnd+cwndIncr;
+			lastAckedSeq = tcp.ackNo;
+			sendAndUpdateWithTimeout();
+			highTxMark = nextTxSeq + 1448;
+		    rtt = max(rtt, tcp.timestampEchoReply);
+			setTimer(nextTxSeq, 0, 1);
+   			updateAvailWin();
+		}
+	}
+	on(timeout) {
+		if (timeout.data1 <= 0, availWin >= 1448) {
+			sendAndUpdateWithTimeout();
+			highTxMark = nextTxSeq + 1448;
+			setTimer(nextTxSeq, 0, 1);
+			updateAvailWin();
+		}
+		if (timeout.data1 > 0, timeout.data0 >= lastAckedSeq, currentRetxRound < timeout.data1) {
+			currentRetxRound = currentRetxRound + 1;
+			initPacing();
+		}
+	}
+}
+

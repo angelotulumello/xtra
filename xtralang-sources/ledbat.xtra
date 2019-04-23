@@ -1,0 +1,68 @@
+Register seq, cwnd, baseRtt, rtt, offset, queueDelay, tmp, cwnd_pkts, availWin, lastAck;
+
+State initial init {
+	seq = 1;
+	cwnd = 10 * 1448;
+	rtt = 50;
+	baseRtt = 50;
+	lastAck = 1;
+
+	availWin = 3*1448;
+
+	setField(udp.p1, 1, seq);
+	setField(udp.length, 1, 1456);
+	setTimer(10, 1, 3000000);
+	setNextState(udpArq);
+}
+
+State udpArq {
+	on (timeout) {
+		if (timeout.data0 == 10){
+			setField(udp.p2, 1, currentTime);
+			sendPacket(1, 1);
+			setTimer(1, 1, 10000);
+			availWin = availWin - 1448;
+		}
+		if (availWin >= 1448) {
+			seq = seq + 1448;
+			availWin = availWin - 1448;
+
+			setField(udp.p1, 1, seq);
+			setField(udp.p2, 1, currentTime);
+			setTimer(1, 1, 1);
+
+			sendPacket(1, 1);
+		}
+	}
+
+	on (pktRcvd) {
+		if (lastAck >= 0) {
+			lastAck = udp.p1;
+
+			rtt = currentTime - udp.p2;
+			baseRtt = min(baseRtt, rtt);
+
+			queueDelay = rtt - baseRtt;
+			queueDelay = queueDelay;
+
+			offset = 50 - queueDelay;
+
+			cwnd_pkts = cwnd / 1448;
+
+			tmp = offset * 300; 	//offset * GAIN
+			tmp = tmp / cwnd_pkts;
+			cwnd = cwnd + tmp;
+
+			seq = seq + 1448;
+
+			availWin = seq - lastAck;
+			availWin = cwnd - availWin;
+
+			setField(udp.p1, 1, seq);
+			setField(udp.p2, 1, currentTime);
+			sendPacket(1,1);
+
+			setTimer(1,1,1);
+		}
+	}
+}
